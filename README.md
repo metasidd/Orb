@@ -70,7 +70,7 @@ OrbView(configuration: configuration)
 |----------|------|---------|-------------|
 | `backgroundColors` | `[Color]` | `[.green, .blue, .pink]` | Colors used for the gradient background |
 | `glowColor` | `Color` | `.white` | Color of the glow effects |
-| `coreGlowIntensity` | `Double` | `1.0` | Intensity of the core glow effect |
+| `coreGlowIntensity` | `Double` | `1.0` | Intensity of the core glow effect (higher = brighter) |
 | `showBackground` | `Bool` | `true` | Shows/hides the gradient background |
 | `showWavyBlobs` | `Bool` | `true` | Shows/hides organic movement elements |
 | `showParticles` | `Bool` | `true` | Shows/hides particle effects |
@@ -161,7 +161,7 @@ let shadowOrb = OrbConfiguration(
 - tvOS 17.0+
 - watchOS 10.0+
 - visionOS 1.0+
-- Swift 6.0+
+- Swift 5.9+
 
 ## Contributing
 
