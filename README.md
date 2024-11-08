@@ -1,3 +1,18 @@
+<p align="center">
+  <a href="https://github.com/metasidd/Orb">
+    <img src="https://img.shields.io/github/v/release/metasidd/Orb?style=flat&label=Swift%20Package%20Index&color=red"/>
+  </a>
+  <a href="https://github.com/metasidd/Orb/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/metasidd/Orb?style=flat"/>
+  </a>
+  <a href="https://swiftpackageindex.com/metasidd/Orb">
+    <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmetasidd%2FOrb%2Fbadge%3Ftype%3Dplatforms"/>
+  </a>
+  <a href="https://swiftpackageindex.com/metasidd/Orb">
+    <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fmetasidd%2FOrb%2Fbadge%3Ftype%3Dswift-versions"/>
+  </a>
+</p>
+
 # 🔮 The Orb - SwiftUI
 
 A beautiful, highly customizable animated orb component using SwiftUI. Create mesmerizing, interactive orbs with glowing effects, particles, and dynamic animations.
