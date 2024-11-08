@@ -18,57 +18,22 @@ public struct OrbView: View {
             let size = min(geometry.size.width, geometry.size.height)
 
             ZStack {
-                // Base environment gradient background
                 if config.showBackground {
                     background
                 }
+                
+                outerGlow(size: size)
+                outerRing(size: size)
 
-                // Outer glow effect - creates a soft halo
-                BackgroundView(color: config.glowColor,
-                               rotationSpeed: config.speed * 0.75,
-                               direction: .counterClockwise)
-                    .padding(size * 0.03)
-                    .blur(radius: size * 0.06)
-                    .rotationEffect(.degrees(180))
-                    .blendMode(.destinationOver)
-
-                // Outer ring element - creates contrast
-                BackgroundView(color: config.glowColor.opacity(0.5),
-                               rotationSpeed: config.speed * 0.25,
-                               direction: .clockwise)
-                    .frame(maxWidth: size * 0.94)
-                    .rotationEffect(.degrees(180))
-                    .padding(8)
-                    .blur(radius: size * 0.032)
-
-                // Organic movement elements
                 if config.showWavyBlobs {
-                    wavyBlob // Lower wavy blob
-                    wavyBlobTwo // Upper wavy blob
+                    wavyBlob
+                    wavyBlobTwo
                 }
 
                 if config.showGlowEffects {
-                    // Core glow effects
-                    ZStack {
-                        // Primary core glow - fast rotation
-                        BackgroundView(color: config.glowColor,
-                                       rotationSpeed: config.speed * 3,
-                                       direction: .clockwise)
-                            .blur(radius: size * 0.08)
-                            .opacity(config.coreGlowIntensity)
-
-                        // Secondary core glow - creates layered effect
-                        BackgroundView(color: config.glowColor,
-                                       rotationSpeed: config.speed * 2.3,
-                                       direction: .clockwise)
-                            .blur(radius: size * 0.06)
-                            .opacity(config.coreGlowIntensity)
-                            .blendMode(.plusLighter)
-                    }
-                    .padding(size * 0.08)
+                    coreGlowEffects(size: size)
                 }
 
-                // Floating particle effects
                 if config.showParticles {
                     particleView
                         .frame(maxWidth: size, maxHeight: size)
@@ -121,7 +86,7 @@ public struct OrbView: View {
         // Added multiple particle effects since the blurring amounts are different
         ZStack {
             ParticlesView(
-                color: .white,
+                color: config.particleColor,
                 speedRange: 10...20,
                 sizeRange: 0.5...1,
                 particleCount: 10,
@@ -130,7 +95,7 @@ public struct OrbView: View {
             .blur(radius: 1)
             
             ParticlesView(
-                color: .white,
+                color: config.particleColor,
                 speedRange: 20...30,
                 sizeRange: 0.2...1,
                 particleCount: 10,
@@ -144,7 +109,7 @@ public struct OrbView: View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
 
-            BackgroundView(color: .white.opacity(0.75),
+            RotatingGlowView(color: .white.opacity(0.75),
                            rotationSpeed: config.speed * 1.5,
                            direction: .clockwise)
                 .mask {
@@ -161,7 +126,7 @@ public struct OrbView: View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
 
-            BackgroundView(color: .white,
+            RotatingGlowView(color: .white,
                            rotationSpeed: config.speed * 0.75,
                            direction: .counterClockwise)
                 .mask {
@@ -174,6 +139,44 @@ public struct OrbView: View {
                 .blur(radius: 1)
                 .blendMode(.plusLighter)
         }
+    }
+
+    private func outerGlow(size: CGFloat) -> some View {
+        RotatingGlowView(color: config.glowColor,
+                      rotationSpeed: config.speed * 0.75,
+                      direction: .counterClockwise)
+            .padding(size * 0.03)
+            .blur(radius: size * 0.06)
+            .rotationEffect(.degrees(180))
+            .blendMode(.destinationOver)
+    }
+
+    private func outerRing(size: CGFloat) -> some View {
+        RotatingGlowView(color: config.glowColor.opacity(0.5),
+                      rotationSpeed: config.speed * 0.25,
+                      direction: .clockwise)
+            .frame(maxWidth: size * 0.94)
+            .rotationEffect(.degrees(180))
+            .padding(8)
+            .blur(radius: size * 0.032)
+    }
+
+    private func coreGlowEffects(size: CGFloat) -> some View {
+        ZStack {
+            RotatingGlowView(color: config.glowColor,
+                          rotationSpeed: config.speed * 3,
+                          direction: .clockwise)
+                .blur(radius: size * 0.08)
+                .opacity(config.coreGlowIntensity)
+
+            RotatingGlowView(color: config.glowColor,
+                          rotationSpeed: config.speed * 2.3,
+                          direction: .clockwise)
+                .blur(radius: size * 0.06)
+                .opacity(config.coreGlowIntensity)
+                .blendMode(.plusLighter)
+        }
+        .padding(size * 0.08)
     }
 }
 

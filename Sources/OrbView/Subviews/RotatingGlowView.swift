@@ -19,7 +19,7 @@ enum RotationDirection {
     }
 }
 
-struct BackgroundView: View {
+struct RotatingGlowView: View {
     @State private var rotation: Double = 0
 
     private let color: Color
@@ -64,7 +64,7 @@ struct BackgroundView: View {
 }
 
 #Preview {
-    BackgroundView(color: .purple,
+    RotatingGlowView(color: .purple,
                    rotationSpeed: 30,
                    direction: .counterClockwise)
         .frame(width: 128, height: 128)
