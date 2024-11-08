@@ -95,7 +95,7 @@ OrbView(configuration: configuration)
 
 ### Preset Configurations
 
-The package includes several beautiful preset configurations that you can use out of the box:
+Explore these beautiful configurations to see what you can achieve. Copy any of the presets below to use in your own project, and feel free to customize them to match your vision.
 
 ```swift
 // Mystic
