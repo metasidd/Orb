@@ -13,7 +13,7 @@ https://github.com/user-attachments/assets/181b5041-df59-40ed-b71b-a9f91292ce0a
 Add Orb as a dependency to your project through Xcode:
 
 1. Go to `File` > `Add Package Dependencies`
-2. Enter the repository URL: `https://github.com/yourusername/Orb.git`
+2. Enter the repository URL: `https://github.com/metasidd/Orb.git`
 3. Click `Add Package`
 
 Or add it to your `Package.swift` file:
