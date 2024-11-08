@@ -7,13 +7,10 @@
 import SwiftUI
 
 public struct OrbView: View {
-    let configuration: OrbConfiguration
-
-    private var glowColor: Color { configuration.glowColor }
-    private var orbElementsSpeed: Double { configuration.speed }
+    private let config: OrbConfiguration
     
     public init(configuration: OrbConfiguration = OrbConfiguration()) {
-        self.configuration = configuration
+        self.config = configuration
     }
 
     public var body: some View {
@@ -22,13 +19,13 @@ public struct OrbView: View {
 
             ZStack {
                 // Base environment gradient background
-                if configuration.showBackground {
+                if config.showBackground {
                     background
                 }
 
                 // Outer glow effect - creates a soft halo
-                BackgroundView(color: glowColor,
-                               rotationSpeed: orbElementsSpeed * 0.75,
+                BackgroundView(color: config.glowColor,
+                               rotationSpeed: config.speed * 0.75,
                                direction: .counterClockwise)
                     .padding(size * 0.03)
                     .blur(radius: size * 0.06)
@@ -36,8 +33,8 @@ public struct OrbView: View {
                     .blendMode(.destinationOver)
 
                 // Outer ring element - creates contrast
-                BackgroundView(color: glowColor.opacity(0.5),
-                               rotationSpeed: orbElementsSpeed * 0.25,
+                BackgroundView(color: config.glowColor.opacity(0.5),
+                               rotationSpeed: config.speed * 0.25,
                                direction: .clockwise)
                     .frame(maxWidth: size * 0.94)
                     .rotationEffect(.degrees(180))
@@ -45,34 +42,34 @@ public struct OrbView: View {
                     .blur(radius: size * 0.032)
 
                 // Organic movement elements
-                if configuration.showWavyBlobs {
+                if config.showWavyBlobs {
                     wavyBlob // Lower wavy blob
                     wavyBlobTwo // Upper wavy blob
                 }
 
-                if configuration.showGlowEffects {
+                if config.showGlowEffects {
                     // Core glow effects
                     ZStack {
                         // Primary core glow - fast rotation
-                        BackgroundView(color: glowColor,
-                                       rotationSpeed: orbElementsSpeed * 3,
+                        BackgroundView(color: config.glowColor,
+                                       rotationSpeed: config.speed * 3,
                                        direction: .clockwise)
                             .blur(radius: size * 0.08)
-                            .opacity(configuration.coreGlowIntensity)
+                            .opacity(config.coreGlowIntensity)
 
                         // Secondary core glow - creates layered effect
-                        BackgroundView(color: glowColor,
-                                       rotationSpeed: orbElementsSpeed * 2.3,
+                        BackgroundView(color: config.glowColor,
+                                       rotationSpeed: config.speed * 2.3,
                                        direction: .clockwise)
                             .blur(radius: size * 0.06)
-                            .opacity(configuration.coreGlowIntensity)
+                            .opacity(config.coreGlowIntensity)
                             .blendMode(.plusLighter)
                     }
                     .padding(size * 0.08)
                 }
 
                 // Floating particle effects
-                if configuration.showParticles {
+                if config.showParticles {
                     particleView
                         .frame(maxWidth: size, maxHeight: size)
                 }
@@ -101,7 +98,7 @@ public struct OrbView: View {
             // Adding realistic, layered shadows so its brighter near the core, and softer as it grows outwards
             .modifier(
                 RealisticShadowModifier(
-                    colors: configuration.showShadow ? configuration.backgroundColors : [.clear],
+                    colors: config.showShadow ? config.backgroundColors : [.clear],
                     radius: size * 0.08
                 )
             )
@@ -109,7 +106,7 @@ public struct OrbView: View {
     }
 
     var background: some View {
-        LinearGradient(colors: configuration.backgroundColors,
+        LinearGradient(colors: config.backgroundColors,
                        startPoint: .bottom,
                        endPoint: .top)
     }
@@ -148,10 +145,10 @@ public struct OrbView: View {
             let size = min(geometry.size.width, geometry.size.height)
 
             BackgroundView(color: .white.opacity(0.75),
-                           rotationSpeed: orbElementsSpeed * 1.5,
+                           rotationSpeed: config.speed * 1.5,
                            direction: .clockwise)
                 .mask {
-                    WavyBlobView(color: .white, loopDuration: 60 / orbElementsSpeed * 1.75)
+                    WavyBlobView(color: .white, loopDuration: 60 / config.speed * 1.75)
                         .frame(maxWidth: size * 1.875)
                         .offset(x: 0, y: size * 0.31)
                 }
@@ -165,10 +162,10 @@ public struct OrbView: View {
             let size = min(geometry.size.width, geometry.size.height)
 
             BackgroundView(color: .white,
-                           rotationSpeed: orbElementsSpeed * 0.75,
+                           rotationSpeed: config.speed * 0.75,
                            direction: .counterClockwise)
                 .mask {
-                    WavyBlobView(color: .white, loopDuration: 60 / orbElementsSpeed * 2.25)
+                    WavyBlobView(color: .white, loopDuration: 60 / config.speed * 2.25)
                         .frame(maxWidth: size * 1.25)
                         .rotationEffect(.degrees(90))
                         .offset(x: 0, y: size * -0.31)
