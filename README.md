@@ -66,6 +66,7 @@ The `OrbView` can be customized using `OrbConfiguration`:
 let configuration = OrbConfiguration(
     backgroundColors: [.purple, .blue, .pink], // Custom gradient colors
     glowColor: .white,                         // Glow effect color
+    particleColor: .white,                     // Particle effect color
     coreGlowIntensity: 1.2,                   // Intensity of the core glow
     showBackground: true,                      // Toggle background visibility
     showWavyBlobs: true,                      // Toggle organic movement elements
@@ -85,6 +86,7 @@ OrbView(configuration: configuration)
 |----------|------|---------|-------------|
 | `backgroundColors` | `[Color]` | `[.green, .blue, .pink]` | Colors used for the gradient background |
 | `glowColor` | `Color` | `.white` | Color of the glow effects |
+| `particleColor` | `Color` | `.white` | Color of the particle effects |
 | `coreGlowIntensity` | `Double` | `1.0` | Intensity of the core glow effect (higher = brighter) |
 | `showBackground` | `Bool` | `true` | Shows/hides the gradient background |
 | `showWavyBlobs` | `Bool` | `true` | Shows/hides organic movement elements |
