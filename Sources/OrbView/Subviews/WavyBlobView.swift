@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct WavyBlobView: View {
-    @State private var points: [CGPoint] = (0 ..< 6).map { index in
+    @Binding var isAnimating: Bool
+    @State private var animationStartDate: Date?
+    @State private var accumulatedTime: Double = 0
+
+    @State private var points: [CGPoint] = (0..<6).map { index in
         let angle = (Double(index) / 6) * 2 * .pi
         return CGPoint(
             x: 0.5 + cos(angle) * 0.9,
@@ -12,17 +16,28 @@ struct WavyBlobView: View {
     private let color: Color
     private let loopDuration: Double
 
-    init(color: Color, loopDuration: Double = 1) {
+    init(isAnimating: Binding<Bool>, color: Color, loopDuration: Double = 1) {
+        self._isAnimating = isAnimating
         self.color = color
         self.loopDuration = loopDuration
     }
 
     var body: some View {
         TimelineView(.animation) { timeline in
-            Canvas { context, size in
-                let timeNow = timeline.date.timeIntervalSinceReferenceDate
-                let angle = (timeNow.remainder(dividingBy: loopDuration) / loopDuration) * 2 * .pi
+            let date = timeline.date
 
+            // Compute the angle based on whether the animation is active
+            let angle: Double = {
+                if let startDate = animationStartDate {
+                    let elapsedTime = date.timeIntervalSince(startDate)
+                    return ((accumulatedTime + elapsedTime) / loopDuration).truncatingRemainder(dividingBy: 1)
+                        * 2 * .pi
+                } else {
+                    return (accumulatedTime / loopDuration).truncatingRemainder(dividingBy: 1) * 2 * .pi
+                }
+            }()
+
+            Canvas { context, size in
                 var path = Path()
                 let center = CGPoint(x: size.width / 2, y: size.height / 2)
                 let radius = min(size.width, size.height) * 0.45
@@ -78,12 +93,29 @@ struct WavyBlobView: View {
                 context.fill(path, with: .color(color))
             }
         }
-        .animation(.spring(), value: points)
+        .onAppear {
+            if isAnimating {
+                animationStartDate = Date()
+            }
+        }
+        .onChange(of: isAnimating) { newValue in
+            if newValue {
+                // Resume animation
+                animationStartDate = Date()
+            } else {
+                // Pause animation and accumulate elapsed time
+                if let startDate = animationStartDate {
+                    let elapsedTime = Date().timeIntervalSince(startDate)
+                    accumulatedTime += elapsedTime
+                    animationStartDate = nil
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    WavyBlobView(color: .purple)
+    WavyBlobView(isAnimating: .constant(true) ,color: .purple)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
 }

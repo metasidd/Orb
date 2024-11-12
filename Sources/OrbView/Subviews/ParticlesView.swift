@@ -126,6 +126,8 @@ class ParticleScene: SKScene {
 }
 
 struct ParticlesView: View {
+    @Binding var isAnimating: Bool
+    
     let color: Color
     let speedRange: ClosedRange<Double>
     let sizeRange: ClosedRange<CGFloat>
@@ -150,12 +152,16 @@ struct ParticlesView: View {
             SpriteView(scene: scene, options: [.allowsTransparency])
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .ignoresSafeArea()
+                .onChange(of: isAnimating) { newValue in
+                    scene.isPaused = !newValue
+                }
         }
     }
 }
 
 #Preview {
     ParticlesView(
+        isAnimating: .constant(true),
         color: .green,
         speedRange: 30...60,
         sizeRange: 0.2...1,

@@ -7,6 +7,10 @@
 import SwiftUI
 
 public struct OrbView: View {
+    @Environment(\.scenePhase) var scenePhase
+    @State private var isAnimating: Bool = true
+    @State private var resumedFromBG = false
+
     private let config: OrbConfiguration
     
     public init(configuration: OrbConfiguration = OrbConfiguration()) {
@@ -60,6 +64,24 @@ public struct OrbView: View {
                 )
             )
         }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            if oldPhase == .background { resumedFromBG = true }
+
+            switch newPhase {
+            case .active:
+                Task {
+                    try await Task.sleep(nanoseconds: resumedFromBG ? 300_000_000 : 100_000_000)
+                    if resumedFromBG { resumedFromBG = false }
+                    isAnimating = true
+                }
+            case .background:
+                isAnimating = false
+            case .inactive:
+                isAnimating = false
+            @unknown default:
+                break
+            }
+        }
     }
 
     private var background: some View {
@@ -78,6 +100,7 @@ public struct OrbView: View {
         // Added multiple particle effects since the blurring amounts are different
         ZStack {
             ParticlesView(
+                isAnimating: $isAnimating,
                 color: config.particleColor,
                 speedRange: 10...20,
                 sizeRange: 0.5...1,
@@ -87,6 +110,7 @@ public struct OrbView: View {
             .blur(radius: 1)
             
             ParticlesView(
+                isAnimating: $isAnimating,
                 color: config.particleColor,
                 speedRange: 20...30,
                 sizeRange: 0.2...1,
@@ -101,16 +125,23 @@ public struct OrbView: View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
 
-            RotatingGlowView(color: .white.opacity(0.75),
-                           rotationSpeed: config.speed * 1.5,
-                           direction: .clockwise)
-                .mask {
-                    WavyBlobView(color: .white, loopDuration: 60 / config.speed * 1.75)
-                        .frame(maxWidth: size * 1.875)
-                        .offset(x: 0, y: size * 0.31)
-                }
-                .blur(radius: 1)
-                .blendMode(.plusLighter)
+            RotatingGlowView(
+                isAnimating: $isAnimating,
+                color: .white.opacity(0.75),
+                rotationSpeed: config.speed * 1.5,
+                direction: .clockwise
+            )
+            .mask {
+                WavyBlobView(
+                    isAnimating: $isAnimating,
+                    color: .white,
+                    loopDuration: 60 / config.speed * 1.75
+                )
+                .frame(maxWidth: size * 1.875)
+                .offset(x: 0, y: size * 0.31)
+            }
+            .blur(radius: 1)
+            .blendMode(.plusLighter)
         }
     }
 
@@ -118,35 +149,48 @@ public struct OrbView: View {
         GeometryReader { geometry in
             let size = min(geometry.size.width, geometry.size.height)
 
-            RotatingGlowView(color: .white,
-                           rotationSpeed: config.speed * 0.75,
-                           direction: .counterClockwise)
-                .mask {
-                    WavyBlobView(color: .white, loopDuration: 60 / config.speed * 2.25)
-                        .frame(maxWidth: size * 1.25)
-                        .rotationEffect(.degrees(90))
-                        .offset(x: 0, y: size * -0.31)
-                }
-                .opacity(0.5)
-                .blur(radius: 1)
-                .blendMode(.plusLighter)
+            RotatingGlowView(
+                isAnimating: $isAnimating,
+                color: .white,
+                rotationSpeed: config.speed * 0.75,
+                direction: .counterClockwise
+            )
+            .mask {
+                WavyBlobView(
+                    isAnimating: $isAnimating,
+                    color: .white,
+                    loopDuration: 60 / config.speed * 2.25
+                )
+                .frame(maxWidth: size * 1.25)
+                .rotationEffect(.degrees(90))
+                .offset(x: 0, y: size * -0.31)
+            }
+            .opacity(0.5)
+            .blur(radius: 1)
+            .blendMode(.plusLighter)
         }
     }
 
     private func coreGlowEffects(size: CGFloat) -> some View {
         ZStack {
-            RotatingGlowView(color: config.glowColor,
-                          rotationSpeed: config.speed * 3,
-                          direction: .clockwise)
-                .blur(radius: size * 0.08)
-                .opacity(config.coreGlowIntensity)
+            RotatingGlowView(
+                isAnimating: $isAnimating,
+                color: config.glowColor,
+                rotationSpeed: config.speed * 3,
+                direction: .clockwise
+            )
+            .blur(radius: size * 0.08)
+            .opacity(config.coreGlowIntensity)
 
-            RotatingGlowView(color: config.glowColor,
-                          rotationSpeed: config.speed * 2.3,
-                          direction: .clockwise)
-                .blur(radius: size * 0.06)
-                .opacity(config.coreGlowIntensity)
-                .blendMode(.plusLighter)
+            RotatingGlowView(
+                isAnimating: $isAnimating,
+                color: config.glowColor,
+                rotationSpeed: config.speed * 2.3,
+                direction: .clockwise
+            )
+            .blur(radius: size * 0.06)
+            .opacity(config.coreGlowIntensity)
+            .blendMode(.plusLighter)
         }
         .padding(size * 0.08)
     }
@@ -155,22 +199,28 @@ public struct OrbView: View {
     private func baseDepthGlows(size: CGFloat) -> some View {
         ZStack {
             // Outer glow (previously outerGlow function)
-            RotatingGlowView(color: config.glowColor,
-                          rotationSpeed: config.speed * 0.75,
-                          direction: .counterClockwise)
-                .padding(size * 0.03)
-                .blur(radius: size * 0.06)
-                .rotationEffect(.degrees(180))
-                .blendMode(.destinationOver)
-            
+            RotatingGlowView(
+                isAnimating: $isAnimating,
+                color: config.glowColor,
+                rotationSpeed: config.speed * 0.75,
+                direction: .counterClockwise
+            )
+            .padding(size * 0.03)
+            .blur(radius: size * 0.06)
+            .rotationEffect(.degrees(180))
+            .blendMode(.destinationOver)
+
             // Outer ring (previously outerRing function)
-            RotatingGlowView(color: config.glowColor.opacity(0.5),
-                          rotationSpeed: config.speed * 0.25,
-                          direction: .clockwise)
-                .frame(maxWidth: size * 0.94)
-                .rotationEffect(.degrees(180))
-                .padding(8)
-                .blur(radius: size * 0.032)
+            RotatingGlowView(
+                isAnimating: $isAnimating,
+                color: config.glowColor.opacity(0.5),
+                rotationSpeed: config.speed * 0.25,
+                direction: .clockwise
+            )
+            .frame(maxWidth: size * 0.94)
+            .rotationEffect(.degrees(180))
+            .padding(8)
+            .blur(radius: size * 0.032)
         }
     }
 
