@@ -8,7 +8,7 @@ import SwiftUI
 import SpriteKit
 
 class ParticleScene: SKScene {
-    let color: UIColor
+    let color: PlatformColor
     let speedRange: ClosedRange<Double>
     let sizeRange: ClosedRange<CGFloat>
     let particleCount: Int
@@ -16,7 +16,7 @@ class ParticleScene: SKScene {
     
     init(
         size: CGSize,
-        color: UIColor,
+        color: PlatformColor,
         speedRange: ClosedRange<Double>,
         sizeRange: ClosedRange<CGFloat>,
         particleCount: Int,
@@ -112,6 +112,49 @@ class ParticleScene: SKScene {
     
     private func createParticleTexture() -> SKTexture {
         let size = CGSize(width: 8, height: 8)  // Smaller size for better performance
+
+        #if os(macOS)
+        // Hat tip: https://www.hackingwithswift.com/forums/macos/drawing-graphics-in-macos/23135
+
+        let pixelsWide = Int(size.width)
+        let pixelsHigh = Int(size.height)
+        let bitmapBytesPerRow = pixelsWide * 4
+        let bufferLength = pixelsHigh * bitmapBytesPerRow
+        let bitmapData = CFDataCreateMutable(nil, 0)
+
+        CFDataSetLength(bitmapData, CFIndex(bufferLength))
+
+        let bitmap = CFDataGetMutableBytePtr(bitmapData)
+
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+
+        let context = CGContext(
+            data: bitmap,
+            width: pixelsWide,
+            height: pixelsHigh,
+            bitsPerComponent: 8,
+            bytesPerRow: bitmapBytesPerRow,
+            space: colorSpace,
+            bitmapInfo: bitmapInfo.rawValue
+        )
+
+        context?.setFillColor(.white)
+        let circlePath = NSBezierPath(ovalIn: CGRect(origin: .zero, size: size))
+        circlePath.fill()
+
+        context?.addPath(circlePath.cgPath)
+        context?.drawPath(using: .fillStroke)
+
+        let image = context?.makeImage()
+
+        guard let image else {
+            return SKTexture()
+        }
+
+        return SKTexture(cgImage: image)
+
+        #else
         let renderer = UIGraphicsImageRenderer(size: size)
         
         let image = renderer.image { context in
@@ -122,6 +165,7 @@ class ParticleScene: SKScene {
         }
         
         return SKTexture(image: image)
+        #endif
     }
 }
 
@@ -135,7 +179,7 @@ struct ParticlesView: View {
     var scene: SKScene {
         let scene = ParticleScene(
             size: CGSize(width: 300, height: 300), // Use fixed size
-            color: UIColor(color),
+            color: PlatformColor(color),
             speedRange: speedRange,
             sizeRange: sizeRange,
             particleCount: particleCount,

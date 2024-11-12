@@ -202,4 +202,7 @@ public struct OrbView: View {
     OrbView(configuration: config)
         .aspectRatio(1, contentMode: .fit)
         .frame(maxWidth: 120)
+        #if os(macOS)
+        .padding()
+        #endif
 }
