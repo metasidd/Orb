@@ -7,8 +7,18 @@
 import SwiftUI
 import SpriteKit
 
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
+
 class ParticleScene: SKScene {
+    #if os(macOS)
+    let color: NSColor
+    #else
     let color: UIColor
+    #endif
     let speedRange: ClosedRange<Double>
     let sizeRange: ClosedRange<CGFloat>
     let particleCount: Int
@@ -16,13 +26,17 @@ class ParticleScene: SKScene {
     
     init(
         size: CGSize,
-        color: UIColor,
+        color: Color,
         speedRange: ClosedRange<Double>,
         sizeRange: ClosedRange<CGFloat>,
         particleCount: Int,
         opacityRange: ClosedRange<Double>
     ) {
-        self.color = color
+        #if os(macOS)
+        self.color = NSColor(color)
+        #else
+        self.color = UIColor(color)
+        #endif
         self.speedRange = speedRange
         self.sizeRange = sizeRange
         self.particleCount = particleCount
@@ -111,17 +125,24 @@ class ParticleScene: SKScene {
     }
     
     private func createParticleTexture() -> SKTexture {
-        let size = CGSize(width: 8, height: 8)  // Smaller size for better performance
-        let renderer = UIGraphicsImageRenderer(size: size)
+        let size = CGSize(width: 8, height: 8)
         
+        #if os(macOS)
+        let image = NSImage(size: size)
+        image.lockFocus()
+        NSColor.white.setFill()
+        NSBezierPath(ovalIn: CGRect(origin: .zero, size: size)).fill()
+        image.unlockFocus()
+        return SKTexture(image: image)
+        #else
+        let renderer = UIGraphicsImageRenderer(size: size)
         let image = renderer.image { context in
-            // Simple filled white circle
             UIColor.white.setFill()
             let circlePath = UIBezierPath(ovalIn: CGRect(origin: .zero, size: size))
             circlePath.fill()
         }
-        
         return SKTexture(image: image)
+        #endif
     }
 }
 
@@ -134,8 +155,8 @@ struct ParticlesView: View {
     
     var scene: SKScene {
         let scene = ParticleScene(
-            size: CGSize(width: 300, height: 300), // Use fixed size
-            color: UIColor(color),
+            size: CGSize(width: 300, height: 300),
+            color: color,
             speedRange: speedRange,
             sizeRange: sizeRange,
             particleCount: particleCount,
